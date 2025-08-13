@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+  .dashboard-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .dashboard-shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      overflow: visible;
+    }
+  }
+
+  .sidebar-fixed { background: #212529; color: #fff; }
+  .sidebar-link { color: #fff; }
+  .sidebar-link.active { background-color: rgba(255,255,255,.15); }
+
+  section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flex-fill {
+    flex: 1;
+    overflow-y: auto;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set ep = request.endpoint or '' %}
+{% set products_active = ep in ['dashboard.index','dashboard.products','dashboard.product_edit'] %}
+{% set social_endpoint = 'dashboard.social' %}
+
+<div class="dashboard-shell">
+
+  <!-- Sidebar fijo ≥ md -->
+  <aside class="d-none d-md-block sidebar-fixed p-3">
+    <a href="{{ url_for('dashboard.index') }}" class="d-flex align-items-center mb-3 text-white text-decoration-none">
+      <i class="bi bi-bag-fill me-2 fs-3"></i>
+      <span class="fs-4">SamuStore</span>
+    </a>
+    <hr class="border-secondary">
+
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{{ url_for('dashboard.home') }}" class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.home' }}">
+          <i class="bi bi-house me-2"></i> Home
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('dashboard.products') }}" class="nav-link sidebar-link {{ 'active' if products_active }}">
+          <i class="bi bi-grid-3x3-gap me-2"></i> Products
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('dashboard.product_new') }}" class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.product_new' }}">
+          <i class="bi bi-plus-square me-2"></i> Add Product
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('dashboard.social') }}" class="nav-link sidebar-link {{ 'active' if ep == social_endpoint }}">
+          <i class="bi bi-chat-quote me-2"></i> Social Media
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('dashboard.profile') }}" class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.profile' }}">
+          <i class="bi bi-person-circle me-2"></i> Profile
+        </a>
+      </li>
+    </ul>
+
+    <hr class="border-secondary">
+    <div>
+      <div class="d-flex align-items-center text-white text-decoration-none">
+        <img src="/images/samustore.webp" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong class="text-truncate">{{ current_user.username if current_user.is_authenticated else 'Invitado' }}</strong>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm w-100 mt-3">Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <!-- Contenido + topbar móvil -->
+  <section class="d-flex flex-column min-vh-100">
+    <!-- Topbar móvil -->
+    <nav class="navbar navbar-dark bg-dark d-md-none">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#sbOffcanvas"
+                aria-controls="sbOffcanvas" aria-label="Abrir menú">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand ms-2" href="{{ url_for('dashboard.index') }}">SamuStore</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Salir</a>
+      </div>
+    </nav>
+
+    <!-- Offcanvas móvil -->
+    <div class="offcanvas offcanvas-start text-bg-dark d-md-none"
+         tabindex="-1" id="sbOffcanvas" aria-labelledby="sbOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="sbOffcanvasLabel">SamuStore</h5>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li class="nav-item">
+            <a href="{{ url_for('dashboard.home') }}"
+               class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.home' }}"
+               onclick="closeOffcanvas()">Home</a>
+          </li>
+          <li>
+            <a href="{{ url_for('dashboard.products') }}"
+               class="nav-link sidebar-link {{ 'active' if products_active }}"
+               onclick="closeOffcanvas()">Products</a>
+          </li>
+          <li>
+            <a href="{{ url_for('dashboard.product_new') }}"
+               class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.product_new' }}"
+               onclick="closeOffcanvas()">Add Product</a>
+          </li>
+          <li>
+            <a href="{{ url_for('dashboard.social') }}"
+               class="nav-link sidebar-link {{ 'active' if ep == social_endpoint }}"
+               onclick="closeOffcanvas()">Social Media</a>
+          </li>
+          <li>
+            <a href="{{ url_for('dashboard.profile') }}"
+               class="nav-link sidebar-link {{ 'active' if ep == 'dashboard.profile' }}"
+               onclick="closeOffcanvas()">Profile</a>
+          </li>
+        </ul>
+        <hr class="border-secondary">
+        <div class="d-flex align-items-center">
+          <img src="/images/samustore.webp" alt="" width="32" height="32" class="rounded-circle me-2">
+          <strong class="text-truncate">{{ current_user.username if current_user.is_authenticated else 'Invitado' }}</strong>
+        </div>
+        <a href="{{ url_for('auth.logout') }}"
+           class="btn btn-outline-light btn-sm w-100 mt-3"
+           onclick="closeOffcanvas()">Cerrar sesión</a>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="flex-fill overflow-auto p-3 p-md-4">
+      {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block dashboard_content %}{% endblock %}
+    </div>
+  </section>
+</div>
+
+<!-- Script de cierre de offcanvas -->
+<script>
+  function closeOffcanvas() {
+    const el = document.getElementById('sbOffcanvas');
+    if (el && bootstrap?.Offcanvas) {
+      const instance = bootstrap.Offcanvas.getInstance(el);
+      if (instance) instance.hide();
+    }
+  }
+</script>
+{% endblock %}

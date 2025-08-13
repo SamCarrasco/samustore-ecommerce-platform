@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Error interno (500){% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h1 class="display-5 fw-bold">Ups, algo salió mal</h1>
+  <p class="lead text-muted">Tuvimos un problema procesando tu solicitud. Intenta de nuevo más tarde.</p>
+  <a href="/auth/login" class="btn btn-outline-primary mt-3">Volver al inicio</a>
+</div>
+{% endblock %}

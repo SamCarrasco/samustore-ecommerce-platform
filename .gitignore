@@ -1,0 +1,76 @@
+# ===== ENTORNOS VIRTUALES =====
+.venv/
+venv/
+env/
+ENV/
+
+# ===== ARCHIVOS DE CONFIGURACIÓN SENSIBLES =====
+instance/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuración local
+config.py
+.env
+*.env
+
+# ===== MIGRACIONES =====
+migrations/versions/*.py
+!migrations/README
+
+# ===== LOGS =====
+*.log
+logs/
+*.pid
+
+# ===== ARCHIVOS TEMPORALES =====
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ===== ARCHIVOS COMPILADOS =====
+*.so
+*.dll
+
+# ===== ARCHIVOS DE IDE =====
+.vscode/
+.idea/
+*.iml
+
+# ===== TESTS =====
+htmlcov/
+.coverage
+.pytest_cache/
+
+# ===== FRONTEND BUILD (si tienes assets compilados) =====
+node_modules/
+dist/
+build/
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===== SUBIDAS DE USUARIOS =====
+app/static/uploads/
+app/static/images/uploads/
+app/static/tmp/
+
+# ===== BACKUPS =====
+backup/
+*.sql
+*.tar
+*.gz
+*.zip
+
+# ===== CACHE =====
+.cache/

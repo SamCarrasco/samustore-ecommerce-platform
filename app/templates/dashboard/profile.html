@@ -1,0 +1,98 @@
+{% extends "dashboard/layout.html" %}
+
+{% block dashboard_content %}
+<div class="container-fluid px-0">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h4 mb-1">Perfil de la tienda</h1>
+      <div class="text-muted">Actualiza la información del propietario y la tienda</div>
+    </div>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Volver</a>
+  </div>
+
+  {# ENLACE PÚBLICO (slug básico: minúsculas y espacios -> guiones) #}
+  {% set store_slug = (user.store_name | lower).replace(' ', '-') %}
+  {% set public_url = request.url_root ~ 'public/' ~ store_slug %}
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Enlace público de tu tienda</h2>
+
+      <div class="mb-3">
+        <label class="form-label mb-1">URL para compartir</label>
+        <div class="input-group">
+          <input type="text" readonly class="form-control" value="{{ public_url }}">
+          <button class="btn btn-outline-secondary" type="button"
+                  onclick="navigator.clipboard.writeText('{{ public_url }}'); this.innerText='¡Copiado!'; setTimeout(()=>this.innerText='Copiar',1500);">
+            Copiar
+          </button>
+        </div>
+        <div class="form-text">Ruta pública: /public/&lt;nombre-de-tu-tienda&gt;</div>
+      </div>
+      <div class="text-muted small">
+        * Nota: si tu nombre de tienda tiene acentos o símbolos, considera normalizarlo. Podemos
+        mejorar esto luego con un <em>slugify</em> server-side.
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('dashboard.profile') }}">
+        {# Si usas CSRFProtect, descomenta: #}
+        {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre *</label>
+            <input type="text" name="username" class="form-control" required
+                   value="{{ user.username }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Apellido *</label>
+            <input type="text" name="userlastname" class="form-control" required
+                   value="{{ user.userlastname }}">
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nombre de la tienda *</label>
+            <input type="text" name="store_name" class="form-control" required
+                   value="{{ user.store_name }}">
+            <div class="form-text">Este valor define la URL /public/&lt;nombretienda&gt; (se convierte a minúsculas y guiones).</div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Celular *</label>
+            <input type="text" name="celphone" class="form-control" required
+                   value="{{ user.celphone }}">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Dirección *</label>
+            <input type="text" name="store_address" class="form-control" required
+                   value="{{ user.store_address }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">País *</label>
+            <input type="text" name="country" class="form-control" required
+                   value="{{ user.country }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Ciudad *</label>
+            <input type="text" name="city" class="form-control" required
+                   value="{{ user.city }}">
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+.special {
+    color: red;
+    font-size: 18pt;
+}
+
+
+/* Permite corte elegante de URLs muy largas */
+.link-wrap a {
+  overflow-wrap: anywhere;   /* fallback moderno */
+  word-break: break-word;    /* por si el navegador no soporta lo de arriba */
+}

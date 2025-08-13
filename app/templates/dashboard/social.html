@@ -1,0 +1,140 @@
+{% extends "dashboard/layout.html" %}
+
+{% block dashboard_content %}
+<div class="container-fluid py-3">
+  <h2 class="mb-3">Redes sociales & Contacto</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat == 'danger' else cat }} alert-dismissible fade show" role="alert">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form method="post" action="{{ url_for('dashboard.social') }}">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Instagram (handle o URL)</label>
+                <div class="input-group">
+                  <span class="input-group-text">instagram.com/</span>
+                  <input type="text" name="instagram" class="form-control"
+                         value="{{ prefill.instagram or '' }}" placeholder="tu_usuario o URL completa">
+                </div>
+                <div class="form-text">Puedes escribir solo el usuario o pegar la URL.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Twitter (handle o URL)</label>
+                <div class="input-group">
+                  <span class="input-group-text">@</span>
+                  <input type="text" name="twitter" class="form-control"
+                         value="{{ prefill.twitter or '' }}" placeholder="tu_usuario o URL completa">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">TikTok (handle o URL)</label>
+                <div class="input-group">
+                  <span class="input-group-text">@</span>
+                  <input type="text" name="tiktok" class="form-control"
+                         value="{{ prefill.tiktok or '' }}" placeholder="tu_usuario o URL completa">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Facebook (URL)</label>
+                <input type="url" name="facebook" class="form-control"
+                       value="{{ prefill.facebook or '' }}" placeholder="https://facebook.com/tu_pagina">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">WhatsApp (número con país, solo dígitos)</label>
+                <div class="input-group">
+                  <span class="input-group-text">+</span>
+                  <input type="text" name="whatsapp_number" class="form-control"
+                         value="{{ prefill.wa_number or '' }}" placeholder="59178552369">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Mensaje por defecto (WhatsApp)</label>
+                <input type="text" name="whatsapp_message" class="form-control"
+                       value="{{ prefill.wa_message or '' }}" placeholder="Hola, me interesa tu producto.">
+                <div class="form-text">
+                  Se guardará como <code>https://wa.me/&lt;numero&gt;?text=...</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+              <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Vista previa & enlaces</h5>
+
+          <ul class="list-group mb-3">
+            {% for label, href in links.items() %}
+              <li class="list-group-item">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                  <div class="link-wrap flex-grow-1 min-w-0">
+                    <strong class="d-block">{{ label }}</strong>
+                    {% if href %}
+                      <a href="{{ href }}" target="_blank" rel="noopener"
+                         class="d-inline-block text-break"
+                         style="max-width:100%">{{ href }}</a>
+                    {% else %}
+                      <span class="text-muted">Sin configurar</span>
+                    {% endif %}
+                  </div>
+
+                  <button class="btn btn-sm btn-outline-secondary flex-shrink-0 btn-copy"
+                          {% if not href %}disabled{% endif %}
+                          onclick="copyToClipboard('{{ href|e }}')">
+                    Copiar
+                  </button>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+
+
+
+          <p class="text-muted mb-0">
+            Se usarán estos enlaces en tu página pública y botones de “contáctanos”.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-bg-dark border-0 show position-fixed bottom-0 end-0 m-3';
+    toast.role = 'alert';
+    toast.innerHTML = '<div class="d-flex"><div class="toast-body">Enlace copiado</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 1800);
+  });
+}
+</script>
+{% endblock %}

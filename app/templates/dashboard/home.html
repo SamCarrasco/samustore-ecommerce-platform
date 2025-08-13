@@ -1,0 +1,5 @@
+{% extends "dashboard/layout.html" %}
+
+{% block dashboard_content %}
+<h1>Hola!, {{ current_user.username if current_user.is_authenticated else 'Invitado' }}</h1>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ store_name }} – Catálogo{% endblock %}
+
+{# SEO básico (requiere que base.html tenga {% block extra_head %}{% endblock %} en <head>) #}
+{% block extra_head %}
+  <meta property="og:title" content="{{ store_name }} – Catálogo">
+  <meta property="og:description" content="Explora los productos de {{ store_name }}.">
+  {% if products.items and products.items[0].image_url %}
+    <meta property="og:image" content="{{ image_url(products.items[0].image_url) }}">
+  {% endif %}
+  <meta property="og:type" content="website">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card-img-top { height: 200px; object-fit: contain; }
+  .whatsapp-btn { background-color: #25d366; color: white; }
+  .social-links a { text-decoration: none; }
+  .store-meta { font-size: .95rem; }
+  footer { background-color: #f8f9fa; padding: 2rem 1rem; margin-top: 3rem; text-align: center; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar pública -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">SamuStore</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPublic" aria-controls="navbarPublic" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarPublic">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item me-3">
+          <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-primary" href="{{ url_for('auth.register') }}">¿Quieres vender con nosotros?</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <!-- Encabezado + búsqueda + sort -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h1 class="mb-0">{{ store_name }}</h1>
+      <div class="text-muted store-meta">
+        {{ store_owner.city }}, {{ store_owner.country }} &middot; {{ store_owner.store_address }}
+      </div>
+    </div>
+
+    <form class="d-flex align-items-center gap-2 ms-auto" method="get" role="search">
+      <input class="form-control" name="q" placeholder="Buscar productos" value="{{ q }}">
+      <select class="form-select" name="sort" onchange="this.form.submit()" aria-label="Ordenar">
+        <option value="new"        {{ 'selected' if sort == 'new' }}>Novedades</option>
+        <option value="price_asc"  {{ 'selected' if sort == 'price_asc' }}>Precio: menor a mayor</option>
+        <option value="price_desc" {{ 'selected' if sort == 'price_desc' }}>Precio: mayor a menor</option>
+      </select>
+      <input type="hidden" name="per_page" value="{{ per_page }}">
+      <button class="btn btn-outline-secondary" type="submit">Aplicar</button>
+    </form>
+  </div>
+
+  {% if products.items %}
+    <div class="row g-4">
+      {% for product in products.items %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm">
+          <img
+            src="{{ image_url(product.image_url) if product.image_url else url_for('static', filename='images/no-image.png') }}"
+            class="card-img-top" alt="{{ product.name }}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ product.name }}</h5>
+
+            <p class="card-text text-muted small flex-grow-1">
+              {% if product.description %}
+                {{ product.description[:80] }}{% if product.description|length > 80 %}…{% endif %}
+              {% else %}Sin descripción{% endif %}
+            </p>
+
+            {% if product.original_price and product.original_price > product.price %}
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold text-success">Bs. {{ '%.2f' % product.price }}</span>
+                <span class="text-muted text-decoration-line-through small">Bs. {{ '%.2f' % product.original_price }}</span>
+                <span class="badge bg-danger">
+                  -{{ ((product.original_price - product.price) / product.original_price * 100) | round(0) }}%
+                </span>
+              </div>
+            {% else %}
+              <p class="fw-bold mb-2 text-success">${{ '%.2f' % product.price }}</p>
+            {% endif %}
+
+            <a class="btn whatsapp-btn mt-auto"
+               href="https://wa.me/{{ store_owner.celphone|digits }}?text={{ ('¡Hola! Estoy interesado en: ' ~ product.name)|urlencode }}"
+               target="_blank" rel="noopener" aria-label="WhatsApp sobre {{ product.name }}">
+              <i class="bi bi-whatsapp me-1"></i> Consultar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Paginación completa, preservando filtros -->
+    <nav class="mt-4" aria-label="Paginación de productos">
+      <ul class="pagination justify-content-center mb-0">
+        {% if products.has_prev %}
+          <li class="page-item">
+            <a class="page-link" aria-label="Anterior"
+               href="{{ url_for('public.store_catalog', subdomain=store_slug, q=q, sort=sort, per_page=per_page, page=products.prev_num) }}">
+              « Anterior
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">« Anterior</span></li>
+        {% endif %}
+
+        {% for num in products.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if num %}
+            <li class="page-item {% if products.page == num %}active{% endif %}">
+              <a class="page-link"
+                 href="{{ url_for('public.store_catalog', subdomain=store_slug, q=q, sort=sort, per_page=per_page, page=num) }}">{{ num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if products.has_next %}
+          <li class="page-item">
+            <a class="page-link" aria-label="Siguiente"
+               href="{{ url_for('public.store_catalog', subdomain=store_slug, q=q, sort=sort, per_page=per_page, page=products.next_num) }}">
+              Siguiente »
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Siguiente »</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+  {% else %}
+    <div class="alert alert-info">No hay productos disponibles.</div>
+  {% endif %}
+</div>
+
+<!-- Redes sociales del comercio (antes del footer) -->
+{% if links %}
+<section class="container my-5">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body d-flex flex-wrap align-items-center justify-content-between">
+      <h2 class="h5 mb-3 mb-md-0">Síguenos</h2>
+      <div class="d-flex gap-3 social-links">
+        {% if links.instagram %}<a href="{{ links.instagram }}" target="_blank" rel="noopener"><i class="bi bi-instagram"></i> Instagram</a>{% endif %}
+        {% if links.facebook %}<a href="{{ links.facebook }}" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Facebook</a>{% endif %}
+        {% if links.twitter %}<a href="{{ links.twitter }}" target="_blank" rel="noopener"><i class="bi bi-twitter-x"></i> X</a>{% endif %}
+        {% if links.tiktok %}<a href="{{ links.tiktok }}" target="_blank" rel="noopener"><i class="bi bi-tiktok"></i> TikTok</a>{% endif %}
+        {% if links.youtube %}<a href="{{ links.youtube }}" target="_blank" rel="noopener"><i class="bi bi-youtube"></i> YouTube</a>{% endif %}
+        {% if links.website %}<a href="{{ links.website }}" target="_blank" rel="noopener"><i class="bi bi-globe"></i> Sitio</a>{% endif %}
+        {% if links.whatsapp %}<a href="{{ links.whatsapp }}" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Footer -->
+<footer>
+  <p class="mb-1">Desarrollado por <strong>Samuel Carrasco</strong> – Soluciones Web & Catálogos Digitales</p>
+  <p class="mb-0">
+    <a href="mailto:samuelcr2018@gmail.com" class="me-2">samuelcr2018@gmail.com</a>
+    <a href="https://wa.me/59178552369" class="me-2" target="_blank">WhatsApp</a>
+    <a href="https://github.com/samuelcr" target="_blank">GitHub</a>
+  </p>
+</footer>
+{% endblock %}

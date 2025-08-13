@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-sm-10 col-md-8 col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+          <h1 class="h3 mb-3 text-center">SamuStore</h1>
+          <p class="text-center text-muted mb-4">Inicia sesión en tu cuenta</p>
+
+          {# Mensajes flash (success, danger, info, etc.) #}
+          {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            {# Errores de validación agrupados #}
+            {% if form.errors %}
+              <div class="alert alert-danger">
+                {% for field, field_errors in form.errors.items() %}
+                  {% for error in field_errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              {{ form.email.label(class="form-label") }}
+              {{ form.email(class="form-control", placeholder="tu@email.com") }}
+            </div>
+
+            <div class="mb-2">
+              <div class="d-flex justify-content-between">
+                {{ form.password.label(class="form-label mb-0") }}
+                <a href="#" class="small text-decoration-none">¿Olvidaste tu contraseña?</a>
+              </div>
+              {{ form.password(class="form-control", placeholder="••••••") }}
+            </div>
+
+            <div class="form-check my-3">
+              {{ form.remember(class="form-check-input", id="rememberCheck") }}
+              {{ form.remember.label(class="form-check-label", for="rememberCheck") }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              {{ form.submit.label.text or "Iniciar sesión" }}
+            </button>
+
+            <div class="text-center text-muted small mt-3">
+              ¿No tienes cuenta?
+              <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Regístrate</a>
+            </div>
+
+            <div class="border-top pt-3 mt-4 text-center text-muted small">
+              <!-- <div>Credenciales de prueba</div>
+              <div>Email: admin@tienda.com — Contraseña: 123456</div> -->
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <p class="text-center text-muted small mt-3 mb-0">
+        © {{ config.SITE_NAME or "SamuStore" }} — {{ current_year or '' }}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

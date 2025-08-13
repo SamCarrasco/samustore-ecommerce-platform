@@ -1,0 +1,101 @@
+{% extends "dashboard/layout.html" %}
+
+{% block dashboard_content %}
+<div class="container-fluid px-0">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h4 mb-1">
+        {% if mode == 'edit' %}Editar producto{% else %}Nuevo producto{% endif %}
+      </h1>
+      <div class="text-muted">Completa la información del producto</div>
+    </div>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Volver</a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data"
+            action="{% if mode == 'edit' %}{{ url_for('dashboard.product_edit', id=product.id) }}{% else %}{{ url_for('dashboard.product_new') }}{% endif %}">
+        {# Si tienes CSRFProtect activado globalmente y token disponible, descomenta:
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        #}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre *</label>
+            <input type="text" name="name" class="form-control" required
+                   value="{{ product.name if product else '' }}">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Precio *</label>
+            <input type="number" name="price" class="form-control" step="0.01" min="0" required
+                   value="{{ '%.2f'|format(product.price) if product and product.price is not none else '' }}">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Precio anterior</label>
+            <input type="number" name="original_price" class="form-control" step="0.01" min="0"
+                   value="{{ '%.2f'|format(product.original_price) if product and product.original_price is not none else '' }}">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Subir imagen (archivo)</label>
+            <input type="file" name="image_file" class="form-control" accept="image/*">
+            <div class="form-text">PNG, JPG, JPEG, GIF, WEBP. Máximo 4MB.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Imagen (URL)</label>
+            <input type="url" name="image_url" class="form-control"
+                   value="{{ product.image_url if product and product.image_url else '' }}"
+                   placeholder="https://...">
+            <div class="form-text">Si subes archivo, se usará el archivo y se ignora la URL.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Estado</label>
+            <select name="status" class="form-select">
+              {% set current_status = (product.status if product else 'available') %}
+              <option value="available" {{ 'selected' if current_status == 'available' else '' }}>Disponible</option>
+              <option value="unavailable" {{ 'selected' if current_status == 'unavailable' else '' }}>No disponible</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Descuento desde</label>
+            <input type="date" name="discount_start" class="form-control"
+                   value="{{ product.discount_start.strftime('%Y-%m-%d') if product and product.discount_start else '' }}">
+
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Descuento hasta</label>
+            <input type="date" name="discount_end" class="form-control"
+                   value="{{ product.discount_end.strftime('%Y-%m-%d') if product and product.discount_end else '' }}">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <textarea name="description" class="form-control" rows="4"
+                      placeholder="Opcional…">{{ product.description if product and product.description else '' }}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">
+            {% if mode == 'edit' %}Guardar cambios{% else %}Crear producto{% endif %}
+          </button>
+          <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+      </form>
+
+      {% if mode == 'edit' %}
+      <form action="{{ url_for('dashboard.product_delete', id=product.id) }}" method="POST" class="mt-2">
+        <button class="btn btn-outline-danger" onclick="return confirm('¿Eliminar este producto?')">Eliminar</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

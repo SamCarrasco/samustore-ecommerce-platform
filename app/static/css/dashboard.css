@@ -1,0 +1,2 @@
+.sidebar .nav-link.active { background: #fff; color: #000 !important; }
+.user-dropdown.disabled { pointer-events: none; opacity: .7; }

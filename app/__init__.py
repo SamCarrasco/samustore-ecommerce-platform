@@ -1,7 +1,7 @@
-from flask import Flask, url_for, render_template
+from flask import Flask, url_for, render_template, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import Config
+from config import Config, ProdConfig
 from flask_migrate import Migrate
 import unicodedata
 import re
@@ -26,6 +26,10 @@ def create_app(config_object = Config):
 
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+
+    @app.route("/")
+    def landing():
+        return render_template("landing.html", current_app = current_app)
 
     # Exponer slugify a Jinja:
     @app.context_processor

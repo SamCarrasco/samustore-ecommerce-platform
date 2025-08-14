@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+{% block title %}SamuStore – Convierte tu pasión por la moda en negocio{% endblock %}
+
+{# ========== SEO + OG + JSON-LD ========== #}
+{% block extra_head %}
+  <meta name="description" content="Crea tu tienda de moda en minutos. 0% de comisión por 3 meses, pagos seguros y analytics avanzados.">
+  <meta property="og:title" content="SamuStore – Plataforma #1 de ventas de moda">
+  <meta property="og:description" content="Vende en 24 horas con herramientas profesionales.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{{ url_for('static', filename='images/og-samustore.jpg', _external=True) }}">
+  <meta property="og:url" content="{{ request.url_root|trim('/') }}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SamuStore",
+    "url": "{{ request.url_root|trim('/') }}",
+    "logo": "{{ url_for('static', filename='images/logo-samustore.png', _external=True) }}"
+  }
+  </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root{
+    --ink:#0b0b0b;
+    --ink2:#111827;
+    --muted:#475569;
+    --soft:#f3f4f6;   /* gray-100 */
+    --soft2:#e5e7eb;  /* gray-200 */
+    --soft3:#d1d5db;  /* gray-300 */
+  }
+  body{ background:#fff; color:var(--ink2); }
+  .navbar .nav-link{ color:#4b5563; } .navbar .nav-link:hover{ color:#000; }
+
+  .btn-brand{ background:#000; color:#fff; border:0; }
+  .btn-brand:hover{ background:#1f2937; color:#fff; }
+  .btn-outline-brand{ border:1px solid #000; color:#000; background:transparent; }
+  .btn-outline-brand:hover{ background:#f9fafb; color:#000; }
+
+  .badge-soft{ background:var(--soft2); color:#000; }
+  .section-title{ color:var(--ink2); }
+  .section-sub{ color:var(--muted); }
+  .brand-gradient{ background:var(--soft); }
+  .logo-strip img{ height:28px; opacity:.75; filter:grayscale(100%); }
+  .logo-strip img:hover{ opacity:1; filter:none; }
+
+  .feature-icon{
+    width:56px;height:56px;border-radius:14px;
+    display:grid;place-items:center;
+    background:#f1f5f9;color:#000;
+  }
+  .kpi-card .kpi-value{ font-weight:800; letter-spacing:-.02em; }
+  .price-card.featured{ border:2px solid #000; }
+  footer{ background:#1f2937; color:#e5e7eb; }
+  footer a{ color:#d1d5db; } footer a:hover{ color:#fff; text-decoration:underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2"
+       href="{{ url_for('public.index') if 'public.index' in current_app.view_functions else '/' }}">
+      <img src="{{ url_for('static', filename='images/samustore.webp') }}" alt="SamuStore" width="28" height="28" class="rounded">
+      <strong>SamuStore</strong>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Mostrar navegación">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
+        <li class="nav-item"><a class="nav-link" href="#como-funciona">Cómo funciona</a></li>
+        <li class="nav-item"><a class="nav-link" href="#precios">Precios</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonios</a></li>
+        <li class="nav-item ms-lg-3">
+          <a class="btn btn-outline-brand btn-sm" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-brand btn-sm ms-lg-2" href="{{ url_for('auth.register') }}">Vender ahora</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO (sin imagen gigante) ========== -->
+<section class="brand-gradient py-5 py-lg-6">
+  <div class="container py-3">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-7">
+        <span class="badge badge-soft mb-3">Plataforma #1 de ventas</span>
+        <h1 class="display-4 fw-bold mb-3" style="color:var(--ink2)">
+          Convierte tu pasión por la <span style="color:#000">moda</span> en negocio
+        </h1>
+        <p class="lead section-sub mb-4">
+          Únete a miles de comerciantes que venden con SamuStore. Sin comisiones ocultas y con todas las herramientas que necesitas.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-brand btn-lg px-4" href="{{ url_for('auth.register') }}">Registrarse gratis</a>
+          {% if 'public.index' in current_app.view_functions %}
+            <a class="btn btn-outline-brand btn-lg px-4" href="{{ url_for('public.index') }}">Ver demo</a>
+          {% else %}
+            <a class="btn btn-outline-brand btn-lg px-4" href="#como-funciona">Ver demo</a>
+          {% endif %}
+        </div>
+        <div class="d-flex gap-4 mt-4 text-muted small">
+          <span class="d-flex align-items-center gap-2"><i class="bi bi-people"></i> +10,000 vendedores</span>
+          <span class="d-flex align-items-center gap-2"><i class="bi bi-graph-up-arrow"></i> 95% satisfacción</span>
+        </div>
+      </div>
+
+      <!-- Reemplazo de imagen: logos de confianza + KPIs que convierten -->
+      <div class="col-lg-5">
+        <div class="p-3 p-md-4 bg-white border rounded-4 shadow-sm">
+          <div class="logo-strip d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <!-- Pon aquí PNG/SVG de marcas o sellos de confianza -->
+            <i class="fa-brands fa-cc-visa fa-2x" aria-label="Visa"></i>
+            <i class="fa-brands fa-cc-mastercard fa-2x" aria-label="Mastercard"></i>
+            <i class="fa-solid fa-shield-halved fa-2x" aria-label="SSL"></i>
+            <i class="fa-solid fa-truck-fast fa-2x" aria-label="Shipping"></i>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <div class="kpi-card border rounded-3 p-3 h-100">
+                <div class="text-uppercase small text-muted">Comisión</div>
+                <div class="kpi-value fs-2">0%</div>
+                <div class="text-muted small">Primeros 3 meses</div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="kpi-card border rounded-3 p-3 h-100">
+                <div class="text-uppercase small text-muted">Setup</div>
+                <div class="kpi-value fs-2">24 h</div>
+                <div class="text-muted small">Tu tienda lista</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="kpi-card border rounded-3 p-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-shield-lock"></i>
+                  <strong>Pagos seguros</strong>
+                  <span class="text-muted small">• Protección antifraude • Cumplimiento PCI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 d-grid">
+            <a class="btn btn-brand btn-lg" href="{{ url_for('auth.register') }}">Crear mi tienda</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== BENEFICIOS / TRUST (tres columnas) ========== -->
+<section id="beneficios" class="py-5 bg-white border-top">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4 d-flex">
+        <div class="p-4 border rounded-3 w-100">
+          <div class="feature-icon mb-3"><i class="bi bi-cash-coin"></i></div>
+          <h5 class="fw-semibold">0% comisión</h5>
+          <p class="text-muted mb-0">Durante los primeros 3 meses para despegar sin fricción.</p>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex">
+        <div class="p-4 border rounded-3 w-100">
+          <div class="feature-icon mb-3"><i class="bi bi-shield-check"></i></div>
+          <h5 class="fw-semibold">Pagos seguros</h5>
+          <p class="text-muted mb-0">Acepta todos los métodos con máxima seguridad.</p>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex">
+        <div class="p-4 border rounded-3 w-100">
+          <div class="feature-icon mb-3"><i class="bi bi-lightning-charge"></i></div>
+          <h5 class="fw-semibold">Setup rápido</h5>
+          <p class="text-muted mb-0">Activa tu tienda y empieza a vender en 24 horas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CÓMO FUNCIONA ========== -->
+<section id="como-funciona" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title fw-bold">Todo lo que necesitas para vender</h2>
+      <p class="section-sub">Herramientas pro para escalar tu negocio de moda.</p>
+    </div>
+    <div class="row g-4">
+      {% set feats = [
+        {'icon':'shop','title':'Tienda personalizada','desc':'Crea tu escaparate online con diseños profesionales.'},
+        {'icon':'bar-chart','title':'Analytics avanzados','desc':'Reportes de ventas, clientes y tendencias.'},
+        {'icon':'people','title':'Gestión de clientes','desc':'Pedidos, inventario y mensajes en un solo panel.'},
+        {'icon':'graph-up-arrow','title':'Marketing integrado','desc':'Promos, cupones y campañas en redes.'},
+        {'icon':'shield-lock','title':'Pagos seguros','desc':'Múltiples métodos con protección total.'},
+        {'icon':'headset','title':'Soporte 24/7','desc':'Expertos disponibles cuando los necesites.'}
+      ] %}
+      {% for f in feats %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:999px;background:#f1f5f9;display:grid;place-items:center;">
+              {% if f.icon == 'shop' %}<i class="bi bi-shop fs-4"></i>{% endif %}
+              {% if f.icon == 'bar-chart' %}<i class="bi bi-bar-chart fs-4"></i>{% endif %}
+              {% if f.icon == 'people' %}<i class="bi bi-people fs-4"></i>{% endif %}
+              {% if f.icon == 'graph-up-arrow' %}<i class="bi bi-graph-up-arrow fs-4"></i>{% endif %}
+              {% if f.icon == 'shield-lock' %}<i class="bi bi-shield-lock fs-4"></i>{% endif %}
+              {% if f.icon == 'headset' %}<i class="bi bi-headset fs-4"></i>{% endif %}
+            </div>
+            <h5 class="fw-semibold">{{ f.title }}</h5>
+            <p class="text-muted mb-0">{{ f.desc }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ========== PRECIOS ========== -->
+<section id="precios" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title fw-bold">Precios simples y transparentes</h2>
+      <p class="section-sub">Empieza gratis, paga solo cuando escales.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="fw-bold">Starter</h5>
+            <p class="text-muted">Ideal para tu primera tienda</p>
+            <h3 class="fw-bold mb-3">$0 <small class="text-muted">/mes</small></h3>
+            <ul class="list-unstyled small text-muted mb-4">
+              <li>• 0% comisión por 3 meses</li>
+              <li>• Hasta 50 productos</li>
+              <li>• Pagos seguros</li>
+            </ul>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-brand w-100">Comenzar</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm price-card featured">
+          <div class="card-body">
+            <h5 class="fw-bold">Growth</h5>
+            <p class="text-muted">Para vendedores en expansión</p>
+            <h3 class="fw-bold mb-3">$29 <small class="text-muted">/mes</small></h3>
+            <ul class="list-unstyled small text-muted mb-4">
+              <li>• Productos ilimitados</li>
+              <li>• Analytics avanzados</li>
+              <li>• Marketing integrado</li>
+            </ul>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-brand w-100">Probar Growth</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="fw-bold">Pro</h5>
+            <p class="text-muted">Operaciones a gran escala</p>
+            <h3 class="fw-bold mb-3">$79 <small class="text-muted">/mes</small></h3>
+            <ul class="list-unstyled small text-muted mb-4">
+              <li>• Integraciones API</li>
+              <li>• Soporte prioritario</li>
+              <li>• SLA empresarial</li>
+            </ul>
+            <a href="#contacto" class="btn btn-outline-brand w-100">Hablar con ventas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TESTIMONIOS ========== -->
+<section id="testimonios" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title fw-bold">Historias de éxito reales</h2>
+      <p class="section-sub">Lo que dicen nuestros vendedores</p>
+    </div>
+    <div class="row g-4">
+      {% set reviews = [
+        {'name':'María Fernández','biz':'Boutique Luna','badge':'+300% ventas','text':'En 6 meses pasé de vender localmente a clientes en todo el país. SamuStore cambió mi negocio.'},
+        {'name':'Carlos Mendoza','biz':'Moda Urbana','badge':'50+ pedidos/mes','text':'Súper fácil de usar y el soporte es increíble. Recomendado 100%.'},
+        {'name':'Ana Ruiz','biz':'Estilo Único','badge':'+250% crecimiento','text':'Con las herramientas de marketing, mis ventas se triplicaron el primer trimestre.'}
+      ] %}
+      {% for r in reviews %}
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <p class="fw-semibold mb-0">{{ r.name }}</p>
+                <small class="text-muted">{{ r.biz }}</small>
+              </div>
+              <span class="badge rounded-pill" style="background:#dcfce7;color:#166534">{{ r.badge }}</span>
+            </div>
+            <p class="text-muted fst-italic mb-0">“{{ r.text }}”</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ========== CTA FINAL ========== -->
+<section class="py-5 text-center" style="background: linear-gradient(90deg, #111827, #000);">
+  <div class="container text-white">
+    <h2 class="fw-bold display-6 mb-3">¿Listo para hacer crecer tu negocio?</h2>
+    <p class="mb-4">Regístrate gratis y comienza a vender hoy mismo.</p>
+    <div class="d-flex gap-2 justify-content-center flex-wrap">
+      <a class="btn btn-light btn-lg" href="{{ url_for('auth.register') }}">Comenzar gratis</a>
+      <a class="btn btn-outline-brand btn-lg" href="#contacto" style="border-color:#fff;color:#fff">Hablar con ventas</a>
+    </div>
+    <p class="mt-3 small text-white-50">Sin tarjeta • Setup en 24 h • Soporte incluido</p>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="mb-3 text-white">SamuStore</h5>
+        <p class="mb-3">La plataforma líder para comerciantes de moda.</p>
+      </div>
+      <div class="col-md-2">
+        <h6 class="mb-3 text-white">Para vendedores</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{{ url_for('auth.register') }}">Crear tienda</a></li>
+          <li><a href="#como-funciona">Herramientas</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#beneficios">Recursos</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="mb-3 text-white">Soporte</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#faq">Centro de ayuda</a></li>
+          <li><a href="mailto:samuelcr2018@gmail.com">Contacto</a></li>
+          <li><a href="#como-funciona">Guías</a></li>
+          <li><a href="#precios">API Docs</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="mb-3 text-white">Empresa</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#nosotros">Sobre nosotros</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#carreras">Carreras</a></li>
+          <li><a href="#prensa">Prensa</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="my-4" style="border-color:#374151;">
+    <div class="d-flex flex-wrap justify-content-between small">
+      <span>© {{ 2025 }} SamuStore. Todos los derechos reservados.</span>
+      <span>Desarrollado por <strong>Samuel Carrasco</strong></span>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}
